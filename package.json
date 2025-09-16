@@ -4,7 +4,8 @@
   },
   "dependencies": {
     "express": "^5.1.0",
-    "mongodb": "^6.19.0"
+    "mongodb": "^6.19.0",
+    "mongoose": "^8.18.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
