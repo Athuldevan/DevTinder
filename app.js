@@ -1,6 +1,10 @@
 const express = require("express");
-const connectDb = require("./config/databse");
+const connectDb = require("./config/databse.js");
+const userRouter = require("./routes/userRoute");
+
 const app = express();
+app.use(express.json());
+app.use("/api/v1/users", userRouter);
 
 connectDb()
   .then(() => {
