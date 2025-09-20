@@ -16,9 +16,8 @@ async function signup(req, res) {
       age,
       photoUrl,
     } = req.body;
-    //Validadte the password
 
-    //Encrypt the password
+    //Encrypt or HASH  the user inputed password
     const passwordHash = await bcrypt.hash(password, 10);
 
     const user = await User.create({
@@ -51,7 +50,7 @@ async function login(req, res) {
     if (!emailId || !password) {
       throw new Error("Email and password are required.");
     }
-    validateLogin(req);
+    // validateLogin(req);
     const user = await User.findOne({ emailId: emailId });
 
     if (!user) {
@@ -61,7 +60,9 @@ async function login(req, res) {
     const isPasswordValid = await bcrypt.compare(password, user?.password);
 
     if (isPasswordValid) {
-      const token = jwt.sign({ id: user._id }, "devTinder");
+      const token = jwt.sign({ id: user._id }, "devTinder", {
+        expiresIn: "1d",
+      });
       res.cookie("userId", token, { httpOnly: true, secure: false }); //sending the cookie
 
       res.status(200).json({
@@ -85,7 +86,7 @@ async function login(req, res) {
 //see user profile
 async function getProfile(req, res) {
   try {
-    const {user} = req;
+    const { user } = req;
 
     //if id is present login
     if (user) {
