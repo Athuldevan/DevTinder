@@ -16,22 +16,23 @@ async function getUsers(req, res, next) {
   }
 }
 
-async function createUser(req, res) {
+// Get a single User
+async function getUSer(req, res) {
   try {
-    const user = req.body;
-    await User.create(user);
-
-    res.status(201).json({
+    const id = req.params?.id;
+    const user = await User.findById(id);
+    res.status(200).json({
       status: "success",
       data: user,
     });
   } catch (err) {
     res.status(404).json({
       status: "failed",
-      message: "Failed to create a user" + err,
+      message: err.message,
     });
   }
 }
+
 
 async function deleteUser(req, res) {
   try {
@@ -52,15 +53,14 @@ async function deleteUser(req, res) {
 
 async function updateUser(req, res) {
   try {
-    const id = req.params.id;
     const data = req.body;
-    console.log(data);
+    const id = req.params?.id;
 
     const user = await User.findByIdAndUpdate(id, data, {
       new: true,
       runValidators: true,
     });
-    console.log(data);
+
     res.status(201).json({
       status: "message",
       data: user,
@@ -73,4 +73,4 @@ async function updateUser(req, res) {
   }
 }
 
-module.exports = { getUsers, createUser, deleteUser, updateUser };
+module.exports = { getUsers, getUSer, deleteUser, updateUser };
