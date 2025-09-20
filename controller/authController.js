@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModal");
-const { isStrongPassword } = require("validator");
+const jwt = require("jsonwebtoken");
 const validateLogin = require("../utils/validateLogin");
 
 async function signup(req, res) {
@@ -61,6 +61,9 @@ async function login(req, res) {
     const isPasswordValid = await bcrypt.compare(password, user?.password);
 
     if (isPasswordValid) {
+      const token = jwt.sign({ id: user._id }, "devTinder");
+      res.cookie("userId", token, { httpOnly: true, secure: false }); //sending the cookie
+
       res.status(200).json({
         status: "success",
         data: "Succssfully Logged in.",
@@ -78,4 +81,27 @@ async function login(req, res) {
     });
   }
 }
-module.exports = { signup, login };
+
+//see user profile
+async function getProfile(req, res) {
+  try {
+    const {user} = req;
+
+    //if id is present login
+    if (user) {
+      res.status(200).json({
+        status: "success",
+        data: userProfile,
+      });
+    } else {
+      throw new Error("please Login first");
+    }
+  } catch (err) {
+    console.log(err.message);
+    res.status(404).json({
+      status: "failed",
+      message: err.message,
+    });
+  }
+}
+module.exports = { signup, login, getProfile };
