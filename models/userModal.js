@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema(
       required: [true, "A user must have a user"],
       lowerCase: true,
       trim: true,
-      unique : true,
+      unique: true,
       validate: {
         validator: (emailId) => validator.isEmail(emailId),
         message: "Please enter a valid Email.",
@@ -44,11 +44,10 @@ const userSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      //validator function that return true or false.
-      validate: {
-        validator: (gender) => ["male", "female", "others"].includes(gender),
+      enum: {
+        values: ["male", "female", "others"],
+        message: "{VALUE} is not supported",
       },
-      message: (props) => `${props.value} is not a valid phone numbere`, //error message when validation failes
     },
 
     about: {
