@@ -4,10 +4,17 @@ const {
   deleteUser,
   updateUser,
   getUSer,
+  getAllConnectionRequests,
 } = require("../controller/userController");
+const { userAuth } = require("../middleware/auth.middleware");
 const router = express.Router();
 
-router.route("/feed").get(getUsers);
-router.route("/:id").get(getUSer).delete(deleteUser).patch(updateUser);
+router.route("/feed").get(userAuth, getUsers);
+router.route("/requests/recieved").get(userAuth, getAllConnectionRequests);
+router
+  .route("/:id")
+  .get(userAuth, getUSer)
+  .delete(userAuth, deleteUser)
+  .patch(userAuth, updateUser);
 
 module.exports = router;

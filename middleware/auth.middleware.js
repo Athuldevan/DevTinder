@@ -17,7 +17,6 @@ async function userAuth(req, res, next) {
     res.status(400).json({
       status: "failed",
       message: "Please login first",
-      stack: stack,
     });
   }
 }
