@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModal");
 const jwt = require("jsonwebtoken");
-const validateLogin = require("../utils/validateLogin");
 
 async function signup(req, res) {
   try {
@@ -31,6 +30,7 @@ async function signup(req, res) {
       about,
       password: passwordHash,
     });
+
     res.status(201).json({
       status: "success",
       data: user,
@@ -83,26 +83,14 @@ async function login(req, res) {
   }
 }
 
-//see user profile
-async function getProfile(req, res) {
+//LOGOUT
+async function logout(req, res) {
   try {
-    const { user } = req;
-
-    //if id is present login
-    if (user) {
-      res.status(200).json({
-        status: "success",
-        data: userProfile,
-      });
-    } else {
-      throw new Error("please Login first");
-    }
-  } catch (err) {
-    console.log(err.message);
-    res.status(404).json({
-      status: "failed",
-      message: err.message,
-    });
+    res.cookie("userId", null, { expiresIn: new Date(Date.now()) });
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    res.status(500).json({ status: "success", message: "Logout failed" });
   }
 }
-module.exports = { signup, login, getProfile };
+
+module.exports = { signup, login, logout };
