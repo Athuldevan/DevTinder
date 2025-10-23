@@ -1,15 +1,14 @@
 const User = require("../models/userModal");
 const ConnectionRequest = require("../models/conectionRequestModal");
-
+const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
 async function getUsers(req, res, next) {
   try {
-    console.log(`fettching users..........`)
-    const user = await User.find({})
+    console.log(`fettching users..........`);
+    const user = await User.find({});
     res.status(200).send({
       statu: "success",
       data: user,
     });
-
   } catch (err) {
     console.log("Something went wrong" + err);
     res.status(404).send({
@@ -18,8 +17,6 @@ async function getUsers(req, res, next) {
     });
   }
 }
-
-
 
 // Get a single User
 async function getUSer(req, res) {
@@ -55,7 +52,6 @@ async function deleteUser(req, res) {
   }
 }
 
-
 //Update the user
 async function updateUser(req, res) {
   try {
@@ -79,25 +75,25 @@ async function updateUser(req, res) {
   }
 }
 
-//Get all the conecction requests
+//Get all the conecction requests where in pending state means intersted
 async function getAllConnectionRequests(req, res) {
   try {
     const loggedInUser = req.user;
-    console.log(loggedInUser)
     const allConnections = await ConnectionRequest.find({
       toUserId: loggedInUser._id,
       status: "interested",
-    }).populate("fromUserId", ["firstName", "lastName"]);
-
-    if (!allConnections)
-      res.status(200).json({
-        status: "sucess",
+    }).populate("fromUserId", USER_SAFE_DATA);
+    console.log(loggedInUser);
+    console.log(allConnections);
+    if (!allConnections || allConnections.length === 0)
+      res.status(404).json({
+        status: "failed",
         message: "You have zero connection requests",
       });
 
     res.status(200).json({
       status: "sucess",
-      data: allConnections,
+      allConnections,
     });
   } catch (err) {
     res.status(400).json({
@@ -111,11 +107,27 @@ async function getAllConnectionRequests(req, res) {
 const getAllConnections = async function (req, res) {
   try {
     const loggedInUser = req.user;
-   const connections =  await ConnectionRequest.find({ toUserId: loggedInUser._id, status: "accepted" });
-   res.status(200).json({
-    status : 'success',
-    data : connections,
-   })
+
+    const connections = await ConnectionRequest.find({
+      $or: [
+        { toUserId: loggedInUser._id, status: "accepted" },
+        { fromUserId: loggedInUser._id, status: "accepted" },
+      ],
+    })
+      .populate("fromUserId", USER_SAFE_DATA)
+      .populate("toUserId", USER_SAFE_DATA);
+
+    const data = connections.map((row) => {
+      if (row.fromUserId._id.toString() === loggedInUser._id.toString()) {
+        return row.toUserId;
+      }
+      //else case
+      return row.fromUserId;
+    });
+    res.status(200).json({
+      status: "success",
+      data,
+    });
   } catch (err) {
     res.status(400).json({
       status: "failed",
@@ -130,5 +142,5 @@ module.exports = {
   deleteUser,
   updateUser,
   getAllConnectionRequests,
-  getAllConnections
+  getAllConnections,
 };
