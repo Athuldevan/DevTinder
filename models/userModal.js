@@ -1,7 +1,7 @@
 "use strict";
 const mongoose = require("mongoose");
-
 const validator = require("validator");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "A user must have a name"],
       maxLength: 20,
+      select: true,
     },
     lastName: {
       type: String,
@@ -73,6 +74,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
+userSchema.methods.isPassWordCorrect = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
+const User = mongoose.model("User", userSchema);
 module.exports = User;

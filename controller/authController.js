@@ -45,19 +45,21 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    //password validation
+   
     const { emailId, password } = req.body;
     if (!emailId || !password) {
       throw new Error("Email and password are required.");
     }
-    // validateLogin(req);
+  
     const user = await User.findOne({ emailId: emailId });
 
     if (!user) {
       throw new Error("No such user found");
     }
-    //comparing the Password in body and password in Database
-    const isPasswordValid = await bcrypt.compare(password, user?.password);
+ 
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid =await  user.isPassWordCorrect(password);
+  
 
     if (isPasswordValid) {
       const token = jwt.sign({ id: user._id }, "devTinder", {
@@ -76,6 +78,7 @@ async function login(req, res) {
       });
     }
   } catch (err) {
+    console.log(err.message)
     res.status(404).json({
       status: "failed",
       message: err.message,

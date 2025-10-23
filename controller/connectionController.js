@@ -3,12 +3,9 @@ const User = require("../models/userModal");
 
 exports.connectionRequest = async (req, res) => {
   try {
-    console.log("Request hit");
-
     const toUserId = req.params.toUserId;
     const fromUserId = req.user?._id;
     const status = req.params.status;
-
     // Validate status BEFORE saving
     const allowedStatus = ["interested", "ignored"];
     if (!allowedStatus.includes(status)) {
@@ -17,11 +14,12 @@ exports.connectionRequest = async (req, res) => {
         message: "Invalid status type",
       });
     }
-
-    // Check if target user exists
     const isToUserIdExists = await User.findById(toUserId);
     if (!isToUserIdExists) {
-      throw new Error("No such user exists");
+      return res.status(404).json({
+        status: "faile",
+        message: "No Such user exists",
+      });
     }
 
     // Check if connection already exists
@@ -37,14 +35,12 @@ exports.connectionRequest = async (req, res) => {
         message: "This connection already exists",
       });
     }
-
     // Save new connection request
     const connectionData = await ConnectionRequestModal.create({
       toUserId,
       fromUserId,
       status,
     });
-
     res.status(200).json({
       status: "success",
       data: connectionData,
@@ -58,10 +54,12 @@ exports.connectionRequest = async (req, res) => {
   }
 };
 
+// review connection request
 exports.reviewConnectionRequests = async function (req, res) {
   try {
     const loggedInUser = req.user;
-    const { status, requestId } = req.params;
+    const { status, requestedId } = req.params;
+    console.log(requestedId)
 
     const allowedStatus = ["accepted", "rejected"];
     if (!allowedStatus.includes(status)) {
@@ -69,17 +67,17 @@ exports.reviewConnectionRequests = async function (req, res) {
     }
 
     const connectionRequest = await ConnectionRequestModal.findOne({
-      _id: requestId,
+      _id: requestedId,
       toUserId: loggedInUser._id,
-      status: "interested",
-    }).populate("fromUserId", [firstName, lastName]);
+      status :"interested"
+    }).populate("fromUserId");
     if (!connectionRequest) {
       return res.status(404).json({ message: "Connection request not found" });
     }
 
     connectionRequest.status = status;
 
-    const data = await ConnectionRequestModal.save();
+    const data = await connectionRequest.save(); //saving the connection request in the database
 
     res.json({ message: "Connection request " + status, data });
   } catch (err) {

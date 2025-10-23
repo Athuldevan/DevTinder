@@ -1,12 +1,15 @@
 const User = require("../models/userModal");
 const ConnectionRequest = require("../models/conectionRequestModal");
+
 async function getUsers(req, res, next) {
   try {
-    const user = await User.find();
+    console.log(`fettching users..........`)
+    const user = await User.find({})
     res.status(200).send({
       statu: "success",
       data: user,
     });
+
   } catch (err) {
     console.log("Something went wrong" + err);
     res.status(404).send({
@@ -15,6 +18,8 @@ async function getUsers(req, res, next) {
     });
   }
 }
+
+
 
 // Get a single User
 async function getUSer(req, res) {
@@ -76,11 +81,10 @@ async function updateUser(req, res) {
 async function getAllConnectionRequests(req, res) {
   try {
     const loggedInUser = req.user;
-
     const allConnections = await ConnectionRequest.find({
       toUserId: loggedInUser._id,
       status: "interested",
-    }).populate("fromUserId", ['firstName', 'lastName']);
+    }).populate("fromUserId", ["firstName", "lastName"]);
 
     if (!allConnections)
       res.status(200).json({
@@ -100,10 +104,28 @@ async function getAllConnectionRequests(req, res) {
   }
 }
 
+//get all connection recieved
+const getAllConnections = async function (req, res) {
+  try {
+    const loggedInUser = req.user;
+   const connections =  await ConnectionRequest.find({ toUserId: loggedInUser._id, status: "accepted" });
+   res.status(200).json({
+    status : 'success',
+    data : connections,
+   })
+  } catch (err) {
+    res.status(400).json({
+      status: "failed",
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   getUsers,
   getUSer,
   deleteUser,
   updateUser,
   getAllConnectionRequests,
+  getAllConnections
 };
