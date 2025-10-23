@@ -74,11 +74,8 @@ exports.reviewConnectionRequests = async function (req, res) {
     if (!connectionRequest) {
       return res.status(404).json({ message: "Connection request not found" });
     }
-
     connectionRequest.status = status;
-
-    const data = await connectionRequest.save(); //saving the connection request in the database
-
+    const data = await connectionRequest.save();
     res.json({ message: "Connection request " + status, data });
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);

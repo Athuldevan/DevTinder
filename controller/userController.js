@@ -55,6 +55,8 @@ async function deleteUser(req, res) {
   }
 }
 
+
+//Update the user
 async function updateUser(req, res) {
   try {
     const data = req.body;
@@ -81,6 +83,7 @@ async function updateUser(req, res) {
 async function getAllConnectionRequests(req, res) {
   try {
     const loggedInUser = req.user;
+    console.log(loggedInUser)
     const allConnections = await ConnectionRequest.find({
       toUserId: loggedInUser._id,
       status: "interested",

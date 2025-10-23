@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.route("/feed").get(userAuth, getUsers);
 router.route("/requests/recieved").get(userAuth, getAllConnectionRequests);
-router.route("/connections").get(getAllConnections);
+router.route("/connections").get(userAuth, getAllConnections);
 router
   .route("/:id")
   .get(userAuth, getUSer)
