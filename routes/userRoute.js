@@ -6,11 +6,13 @@ const {
   getUSer,
   getAllConnectionRequests,
   getAllConnections,
+  getFeed,
 } = require("../controller/userController");
 const { userAuth } = require("../middleware/auth.middleware");
 const router = express.Router();
 
-router.route("/feed").get(userAuth, getUsers);
+router.route("/feed").get(userAuth, getFeed);
+
 router.route("/requests/recieved").get(userAuth, getAllConnectionRequests);
 router.route("/connections").get(userAuth, getAllConnections);
 router

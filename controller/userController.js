@@ -1,16 +1,15 @@
 const User = require("../models/userModal");
 const ConnectionRequest = require("../models/conectionRequestModal");
 const USER_SAFE_DATA = "firstName lastName photoUrl age gender about skills";
+
 async function getUsers(req, res, next) {
   try {
-    console.log(`fettching users..........`);
     const user = await User.find({});
     res.status(200).send({
       statu: "success",
       data: user,
     });
   } catch (err) {
-    console.log("Something went wrong" + err);
     res.status(404).send({
       status: "failed",
       message: "Something went wrong",
@@ -83,8 +82,6 @@ async function getAllConnectionRequests(req, res) {
       toUserId: loggedInUser._id,
       status: "interested",
     }).populate("fromUserId", USER_SAFE_DATA);
-    console.log(loggedInUser);
-    console.log(allConnections);
     if (!allConnections || allConnections.length === 0)
       res.status(404).json({
         status: "failed",
@@ -136,6 +133,53 @@ const getAllConnections = async function (req, res) {
   }
 };
 
+// Get all User  feed
+async function getFeed(req, res) {
+  try {
+    const loggedInUser = req.user;
+    const pageNumber = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skipNumber = (pageNumber - 1) * limit;
+    //finding all the connection (send + recieved);
+    const connectionRequest = await ConnectionRequest.find({
+      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+    }).select("fromUserId toUserId");
+
+    const hideUserFromFeed = new Set();
+    connectionRequest.forEach((user) => {
+      hideUserFromFeed.add(user.fromUserId.toString());
+      hideUserFromFeed.add(user.toUserId.toString());
+    });
+
+    const userFeedSuggestion = await User.find({
+      $and: [
+        { _id: { $nin: Array.from(hideUserFromFeed) } },
+        { _id: { $ne: loggedInUser._id } },
+      ],
+    })
+      .select(USER_SAFE_DATA)
+      .skip(skipNumber)
+      .limit(limit);
+
+      if(userFeedSuggestion <limit){
+        return res.status(404).json({
+          status : 'failed',
+          message : "Finised"
+        })
+      }
+
+    res.status(200).json({
+      status: "sucess",
+      userFeedSuggestion,
+    });
+  } catch (err) {
+    return res.status(400).json({
+      status: "failed",
+      message: err.message,
+    });
+  }
+}
+
 module.exports = {
   getUsers,
   getUSer,
@@ -143,4 +187,5 @@ module.exports = {
   updateUser,
   getAllConnectionRequests,
   getAllConnections,
+  getFeed,
 };
