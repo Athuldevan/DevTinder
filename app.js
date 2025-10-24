@@ -3,9 +3,17 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/authRouter");
 const userRouter = require("./routes/userRoute");
 const profileRouter = require("./routes/profileRouter");
-const { userAuth } = require("./middleware/auth.middleware");
 const RequestRouter = require("./routes/RequestRouter.js");
 const app = express();
+const cors = require("cors");
+
+app.use(
+  cors({
+    origin: "http://127.0.0.1:5173",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
