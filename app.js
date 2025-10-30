@@ -26,7 +26,7 @@ app.use("/api/v1/request", RequestRouter);
 app.use((err, req, res, next) => {
   console.log(err.stack);
   return res.status(404).json({
-    message: err.message || `Url not found`,
+    message: "URL NOT FOUND.",
   });
 });
 

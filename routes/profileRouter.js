@@ -3,6 +3,6 @@ const profileController = require("../controller/profileController");
 const { userAuth } = require("../middleware/auth.middleware");
 
 const router = express.Router();
-router.route("/", userAuth, profileController.getProfile);
+router.get("/", userAuth, profileController.getProfile);
 
 module.exports = router;

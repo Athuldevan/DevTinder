@@ -1,7 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModal");
 const jwt = require("jsonwebtoken");
-
 async function signup(req, res) {
   try {
     const {
@@ -15,10 +14,7 @@ async function signup(req, res) {
       age,
       photoUrl,
     } = req.body;
-
-    //Encrypt or HASH  the user inputed password
     const passwordHash = await bcrypt.hash(password, 10);
-
     const user = await User.create({
       firstName,
       lastName,
@@ -30,11 +26,16 @@ async function signup(req, res) {
       about,
       password: passwordHash,
     });
+    const token = jwt.sign({ id: user._id }, "devTinder", {
+      expiresIn: "1d",
+    });
 
+    res.cookie("userId", token, { httpOnly: true, secure: false }); //sending the cookie
     res.status(201).json({
       status: "success",
       data: user,
     });
+    
   } catch (err) {
     res.status(404).json({
       status: "failed",
@@ -45,7 +46,6 @@ async function signup(req, res) {
 
 async function login(req, res) {
   try {
-    console.log(`requst reached at the login controller`);
     const { emailId, password } = req.body;
     if (!emailId || !password) {
       return res.status(400).json({
@@ -97,7 +97,10 @@ async function logout(req, res) {
     res.cookie("userId", null, { expiresIn: new Date(Date.now()) });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    res.status(500).json({ status: "success", message: "Logout failed" });
+    res.status(500).json({
+      status: "failed",
+      message: "Someting went wrong while Looging ouyt .Try agin!!",
+    });
   }
 }
 

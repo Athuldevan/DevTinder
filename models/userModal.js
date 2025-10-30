@@ -65,10 +65,10 @@ const userSchema = new mongoose.Schema(
       default:
         "https://media.istockphoto.com/id/1220827245/vector/anonymous-gender-neutral-face-avatar-incognito-head-silhouette.jpg?s=612x612&w=0&k=20&c=GMdiPt_h8exnrAQnNo7dIKjwZyYqjH4lRQqV8AOx4QU=",
 
-      validate: {
-        validator: (url) => validator.isURL(url),
-        message: "please enter a valid url.",
-      },
+      // validate: {
+      //   validator: (url) => validator.isURL(url),
+      //   message: "please enter a valid url.",
+      // },
     },
   },
   { timestamps: true }
