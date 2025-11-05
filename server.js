@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 const app = require("./app");
 const connectDb = require("./config/databse");
-const dotenv = require("dotenv");
 dotenv.config()
 connectDb()
   .then(() => {
