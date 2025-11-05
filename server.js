@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const app = require("./app");
 const connectDb = require("./config/databse");
-
+const dotenv = require("dotenv");
+dotenv.config()
 connectDb()
   .then(() => {
     console.log("Connected to the Databse");

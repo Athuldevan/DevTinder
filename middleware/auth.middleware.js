@@ -6,7 +6,7 @@ async function userAuth(req, res, next) {
   try {
     const { userId } = req.cookies;
     if (!userId) throw new Error("user not found.Please login first");
-    const decodedToken = jwt.verify(userId, "devTinder");
+    const decodedToken = jwt.verify(userId, process.env.JWT_SECRET);
     if (!decodedToken) throw new Error("Invalid Token");
     const { id } = decodedToken;
     const user = await User.findById(id);
@@ -16,7 +16,7 @@ async function userAuth(req, res, next) {
   } catch (err) {
     res.status(400).json({
       status: "failed",
-      message: "Please login first",
+      message: "Please login firstttttttttt",
     });
   }
 }

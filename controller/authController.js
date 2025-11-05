@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModal");
 const jwt = require("jsonwebtoken");
+const { sendEmail } = require("../utils/send-mail");
 async function signup(req, res) {
   try {
     const {
@@ -26,7 +27,7 @@ async function signup(req, res) {
       about,
       password: passwordHash,
     });
-    const token = jwt.sign({ id: user._id }, "devTinder", {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
 
@@ -35,7 +36,6 @@ async function signup(req, res) {
       status: "success",
       data: user,
     });
-    
   } catch (err) {
     res.status(404).json({
       status: "failed",
@@ -71,7 +71,15 @@ async function login(req, res) {
         expiresIn: "1d",
       });
       res.cookie("userId", token, { httpOnly: true, secure: false }); //sending the cookie
+      //Sending email;
 
+      console.log(emailId);
+      const email = await sendEmail(
+        emailId,
+        "athuldevan90@gmail.com",
+        "Sucessfully logged in the acccount",
+        "Devtinder Login Sucessfully Compleeted .Happy connection and networking"
+      );
       res.status(200).json({
         status: "success",
         data: user,
@@ -86,12 +94,12 @@ async function login(req, res) {
     console.log(err.message);
     res.status(404).json({
       status: "failed",
-      message: err.message,
+      message: err,
     });
   }
 }
 
-//LOGOUT
+//  LOGOUT
 async function logout(req, res) {
   try {
     res.cookie("userId", null, { expiresIn: new Date(Date.now()) });
