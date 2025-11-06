@@ -1,5 +1,8 @@
 const sgMail = require("@sendgrid/mail");
 const API_KEY = process.env.SENDGRID_API_KEY;
+if(API_KEY) {
+  console.log("API_KEY_SENDGRID IS MISSING>>F")
+}
 
 sgMail.setApiKey(API_KEY);
 
