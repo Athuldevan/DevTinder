@@ -140,36 +140,41 @@ async function getFeed(req, res) {
     const pageNumber = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skipNumber = (pageNumber - 1) * limit;
-    //finding all the connection (send + recieved);
-    const connectionRequest = await ConnectionRequest.find({
-      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+
+    // Get all connection requests involving the logged-in user (sent, received, accepted)
+    const allConnections = await ConnectionRequest.find({
+      $or: [
+        { fromUserId: loggedInUser._id },
+        { toUserId: loggedInUser._id },
+      ],
     }).select("fromUserId toUserId");
 
+    // Build set of user IDs to hide
     const hideUserFromFeed = new Set();
-    connectionRequest.forEach((user) => {
-      hideUserFromFeed.add(user.fromUserId.toString());
-      hideUserFromFeed.add(user.toUserId.toString());
+    allConnections.forEach((conn) => {
+      hideUserFromFeed.add(conn.fromUserId.toString());
+      hideUserFromFeed.add(conn.toUserId.toString());
     });
+    hideUserFromFeed.add(loggedInUser._id.toString()); // hide self
 
+    // Get feed suggestions
     const userFeedSuggestion = await User.find({
-      $and: [
-        { _id: { $nin: Array.from(hideUserFromFeed) } },
-        { _id: { $ne: loggedInUser._id } },
-      ],
+      _id: { $nin: Array.from(hideUserFromFeed) },
     })
       .select(USER_SAFE_DATA)
       .skip(skipNumber)
       .limit(limit);
 
-      if(userFeedSuggestion <limit){
-        return res.status(404).json({
-          status : 'failed',
-          message : "Finised"
-        })
-      }
+    if (userFeedSuggestion.length === 0) {
+      return res.status(200).json({
+        status: "success",
+        message: "No more users",
+        userFeedSuggestion: [],
+      });
+    }
 
     res.status(200).json({
-      status: "sucess",
+      status: "success",
       userFeedSuggestion,
     });
   } catch (err) {
@@ -179,6 +184,7 @@ async function getFeed(req, res) {
     });
   }
 }
+
 
 module.exports = {
   getUsers,

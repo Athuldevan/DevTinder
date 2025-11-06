@@ -6,7 +6,6 @@ const profileRouter = require("./routes/profileRouter");
 const RequestRouter = require("./routes/RequestRouter.js");
 const app = express();
 const cors = require("cors");
-
 app.use(
   cors({
     origin: "http://127.0.0.1:5173",
@@ -17,12 +16,14 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Cron job
+require("./utils/cronJob.js");
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/profile", profileRouter);
 app.use("/api/v1/request", RequestRouter);
 
-//ERROR HANDLING MIDDLEWARE
+//ERROR HANDLING MIDDLEWARE....
 app.use((err, req, res, next) => {
   console.log(err.stack);
   return res.status(404).json({
