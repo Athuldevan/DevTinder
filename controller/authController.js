@@ -74,7 +74,7 @@
         res.cookie("userId", token, { httpOnly: true, secure: false }); //sending the cookie
         //Sending email;
 
-        console.log(emailId);
+       
         // const email = await sendEmail(
         //   emailId,
         //   "athuldevan90@gmail.com",

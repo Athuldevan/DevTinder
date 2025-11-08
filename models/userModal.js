@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema(
     age: {
       type: Number,
     },
+    isPremium : {
+      type : Boolean,
+      default : false,
+    },
+    
 
     emailId: {
       type: String,
