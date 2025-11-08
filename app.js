@@ -14,7 +14,12 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => {
+    req.rawBody = buf.toString(); // Razorpay requires raw body for signature validation
+  }
+}));
+
 app.use(cookieParser());
 
 // Cron job

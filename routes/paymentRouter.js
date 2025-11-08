@@ -12,6 +12,9 @@ router.post("/create", userAuth, paymentController.createPayment);
 router.post("/webhook", async (req, res) => {
   try {
     console.log("web hook hit");
+      console.log("Webhook hit at", new Date().toISOString());
+  console.log("Headers:", req.headers);
+  console.log("Body:", req.body);
     const webhookSignature = req.get("X-Razorpay-Signature"); // Its is an razor pay header that razorpay givess
 
     console.log("webhooko sigature", webhookSignature);
