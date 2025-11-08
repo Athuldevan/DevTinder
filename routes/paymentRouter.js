@@ -11,7 +11,7 @@ const User = require("../models/userModal");
 router.post("/create", userAuth, paymentController.createPayment);
 router.post("/webhook", async (req, res) => {
   try {
-    const webhookSignature = req.get["X-Razorpay-Signature"]; // Its is an razor pay header that razorpay givess
+    const webhookSignature = req.get("X-Razorpay-Signature"); // Its is an razor pay header that razorpay givess
 
     //Validating web hook signature
     const iswebhookValid = validateWebhookSignature(
